@@ -7,12 +7,22 @@ import HeaderUI from './components/HeaderUI';
 import AlertUI from './components/AlertUI';
 import SelectorUI from './components/SelectorUI';
 import IndicatorUI from './components/IndicatorUI';
-import DataFetcher from './functions/DataFetcher';
+import useDataFetcher from './functions/DataFetcher';
 import TableUI from './components/TableUI';
 import ChartUI from './components/ChartUI';
+import { useState } from 'react';
+
+const cityCoords: Record<string, { lat: number, lon: number }> = {
+  guayaquil: { lat: -2.17, lon: -79.92 },
+  quito: { lat: -0.18, lon: -78.47 },
+  manta: { lat: -0.96, lon: -80.71 },
+  cuenca: { lat: -2.90, lon: -79.00 }
+};
+
 function App() {
-  //const [count, setCount] = useState(0)
-  const dataFetcherOutput = DataFetcher()
+  const [seletedcity, setSelectedCity] = useState<string>("quito");
+  const coords = cityCoords[seletedcity] 
+  const dataFetcherOutput = useDataFetcher({ lat: coords.lat, lon: coords.lon });
 
   return (
     <Grid container spacing={5} justifyContent="center" alignItems="center">
@@ -31,7 +41,7 @@ function App() {
 
       {/* Selector*/}
       <Grid size={{ xs: 12, md: 3 }}>Elemento: Selector
-        <SelectorUI />
+        <SelectorUI onCityChange={setSelectedCity}/>
       </Grid>
 
       {/* Indicadores */}
@@ -78,12 +88,12 @@ function App() {
 
       {/* Gráfico */}
       <Grid sx={{ display: { xs: "none", md: "block" } }} >Elemento: Gráfico
-        <ChartUI />
+        <ChartUI lat={coords.lat} lon= {coords.lon}/>
       </Grid>
       
       {/* Tabla */}
       <Grid sx={{ display: { xs: "none", md: "block" } }} >Elemento: Tabla
-        <TableUI />
+        <TableUI lat={coords.lat} lon= {coords.lon}/>
       </Grid>
 
       {/* Información adicional */}

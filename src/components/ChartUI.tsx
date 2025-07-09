@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 
-export default function ChartUI() {
+export default function ChartUI({ lat, lon }: { lat: number, lon: number }) {
    const [arrLabels, setArrLabels] = useState<string[]>([]);
    const [arrValues1, setArrValues1] = useState<number[]>([]);
    const [arrValues2, setArrValues2] = useState<number[]>([]);
@@ -15,7 +15,7 @@ export default function ChartUI() {
       setLoading(true);
       setError(null);
       
-      fetch('https://api.open-meteo.com/v1/forecast?latitude=-0.18&longitude=-78.47&hourly=temperature_2m,wind_speed_10m&forecast_days=1')
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,wind_speed_10m&forecast_days=1`)
          .then(res => {
             if (!res.ok) throw new Error('Error al obtener datos');
             return res.json();
@@ -27,7 +27,7 @@ export default function ChartUI() {
          })
          .catch(() => setError('No se pudieron cargar los datos de Open-Meteo'))
          .finally(() => setLoading(false));
-   }, []);
+   }, [lat, lon]);
 
    if (loading) return <CircularProgress />;
    if (error) return <Alert severity="error">{error}</Alert>;

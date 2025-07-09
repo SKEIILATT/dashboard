@@ -17,19 +17,19 @@ const columns: GridColDef[] = [
    { field: 'id', headerName: 'ID', width: 90 },
    { field: 'label', headerName: 'Hora', width: 120 },
    { field: 'value1', headerName: 'Temperatura (°C)', width: 160 },
-   { field: 'value2', headerName: 'Velocidad del viento 10m (km/h)', width: 140 },
+   { field: 'value2', headerName: 'Velocidad del viento 10m (km/h)', width: 350 },
    {
       field: 'resumen',
       headerName: 'Resumen',
       description: 'No es posible ordenar u ocultar esta columna.',
       sortable: false,
       hideable: false,
-      width: 200,
+      width: 250,
       valueGetter: (_, row) => `A las ${row.label}: ${row.value1}°C, ${row.value2}%`,
    },
 ];
 
-export default function TableUI() {
+export default function TableUI({ lat, lon }: { lat: number, lon: number }) {
    const [arrLabels, setArrLabels] = useState<string[]>([]);
    const [arrValues1, setArrValues1] = useState<number[]>([]);
    const [arrValues2, setArrValues2] = useState<number[]>([]);
@@ -39,7 +39,7 @@ export default function TableUI() {
    useEffect(() => {
       setLoading(true);
       setError(null);
-      fetch('https://api.open-meteo.com/v1/forecast?latitude=-0.18&longitude=-78.47&hourly=temperature_2m,wind_speed_10m&forecast_days=1')
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,wind_speed_10m&forecast_days=1`)
          .then(res => {
             if (!res.ok) throw new Error('Error al obtener datos');
             return res.json();
