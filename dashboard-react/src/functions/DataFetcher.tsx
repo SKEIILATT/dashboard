@@ -7,7 +7,13 @@ interface DataFetcherOutput {
     error: string | null;
 }
 
-export default function DataFetcher() : DataFetcherOutput {
+interface DataFetcherProps {
+    latitude: number;
+    longitude: number;
+    cityName: string;
+}
+
+export default function DataFetcher({ latitude, longitude, cityName }: DataFetcherProps) : DataFetcherOutput {
 
     const [data, setData] = useState<OpenMeteoResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -15,8 +21,11 @@ export default function DataFetcher() : DataFetcherOutput {
 
     useEffect(() => {
 
-        // Reemplace con su URL de la API de Open-Meteo obtenida en actividades previas
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=America%2FChicago`
+        setLoading(true);
+        setError(null);
+
+        // URL de la API de Open-Meteo con coordenadas dinámicas
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=auto`
 
         const fetchData = async () => {
 
@@ -34,9 +43,9 @@ export default function DataFetcher() : DataFetcherOutput {
             } catch (err: any) {
 
                 if (err instanceof Error) {
-                    setError(err.message);
+                    setError(`Error al obtener datos para ${cityName}: ${err.message}`);
                 } else {
-                    setError("Ocurrió un error desconocido al obtener los datos.");
+                    setError(`Ocurrió un error desconocido al obtener los datos para ${cityName}.`);
                 }
 
             } finally {
@@ -46,7 +55,7 @@ export default function DataFetcher() : DataFetcherOutput {
 
         fetchData();
 
-    }, []); // El array vacío asegura que el efecto se ejecute solo una vez después del primer renderizado
+    }, [latitude, longitude, cityName]); // Se ejecuta cuando cambian las coordenadas o la ciudad
 
     return { data, loading, error };
 

@@ -1,6 +1,7 @@
 //import { useState } from 'react'
 //import reactLogo from './assets/react.svg'
 //import viteLogo from '/vite.svg'
+import { useState } from 'react';
 import './App.css'
 import Grid from '@mui/material/Grid';
 import HeaderUI from './components/HeaderUI';
@@ -8,28 +9,51 @@ import AlertUI from './components/AlertUI';
 import SelectorUI from './components/SelectorUI';
 import IndicatorUI from './components/IndicatorUI';
 import DataFetcher from './functions/DataFetcher';
+import TableUI from './components/TableUI';
+import ChartUI from './components/ChartUI';
+import { CITIES, DEFAULT_CITY } from './types/CityData';
+
 function App() {
-  //const [count, setCount] = useState(0)
-  const dataFetcherOutput = DataFetcher()
+  // Estado para manejar la ciudad seleccionada
+  const [selectedCity, setSelectedCity] = useState<string>(DEFAULT_CITY.name);
+  
+  // Obtener las coordenadas de la ciudad seleccionada
+  const currentCity = CITIES[selectedCity] || DEFAULT_CITY;
+  
+  // Función para manejar el cambio de ciudad desde el componente hijo
+  const handleCityChange = (cityKey: string) => {
+    setSelectedCity(cityKey);
+  };
+
+  // Obtener datos de la API con las coordenadas actuales
+  const dataFetcherOutput = DataFetcher({
+    latitude: currentCity.latitude,
+    longitude: currentCity.longitude,
+    cityName: currentCity.displayName
+  });
 
   return (
     <Grid container spacing={5} justifyContent="center" alignItems="center">
 
       {/* Encabezado */}
       <Grid size={{ xs: 12, md: 12 }}>
-        Elemento: Encabezado
+        
         <HeaderUI />
       </Grid>
 
       {/* Alertas */}
       <Grid container justifyContent="right" alignItems="center" size={{ xs: 12 }} >
-        Elemento: Alertas
-        <AlertUI description="No se preveen lluvias" />
+        
+        <AlertUI description={`Datos meteorológicos para ${currentCity.displayName}`} />
       </Grid>
 
       {/* Selector*/}
-      <Grid size={{ xs: 12, md: 3 }}>Elemento: Selector
-        <SelectorUI />
+      <Grid size={{ xs: 12, md: 3 }}>
+        
+        <SelectorUI 
+          selectedCity={selectedCity}
+          onCityChange={handleCityChange}
+        />
       </Grid>
 
       {/* Indicadores */}
@@ -75,10 +99,24 @@ function App() {
 
 
       {/* Gráfico */}
-      <Grid sx={{ display: { xs: "none", md: "block" } }} >Elemento: Gráfico</Grid>
+      <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: "none", md: "block" } }}>
+        <ChartUI 
+          data={dataFetcherOutput.data} 
+          loading={dataFetcherOutput.loading} 
+          error={dataFetcherOutput.error}
+          cityName={currentCity.displayName}
+        />
+      </Grid>
 
       {/* Tabla */}
-      <Grid sx={{ display: { xs: "none", md: "block" } }} >Elemento: Tabla</Grid>
+      <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: "none", md: "block" } }}>
+        <TableUI 
+          data={dataFetcherOutput.data} 
+          loading={dataFetcherOutput.loading} 
+          error={dataFetcherOutput.error}
+          cityName={currentCity.displayName}
+        />
+      </Grid>
 
       {/* Información adicional */}
       <Grid>Elemento: Información adicional</Grid>

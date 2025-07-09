@@ -13,6 +13,10 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@mui/x-charts": "^8.7.0",
+    "@mui/x-data-grid": "^8.7.0",
+    "install": "^0.13.0",
+    "npm": "^11.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

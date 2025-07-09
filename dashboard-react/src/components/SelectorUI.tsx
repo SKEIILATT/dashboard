@@ -1,14 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { CITIES } from '../types/CityData';
 
-export default function SelectorUI() {
-    const [cityInput, setCityInput] = useState<string>('');
+interface SelectorUIProps {
+    selectedCity: string;
+    onCityChange: (cityKey: string) => void;
+}
+
+export default function SelectorUI({ selectedCity, onCityChange }: SelectorUIProps) {
+    const [cityInput, setCityInput] = useState<string>(selectedCity);
+
+    // Sincronizar el estado local con el prop cuando cambie
+    useEffect(() => {
+        setCityInput(selectedCity);
+    }, [selectedCity]);
 
     const handleChange = (event: SelectChangeEvent<string>) => {
-        setCityInput(event.target.value);
+        const newCity = event.target.value;
+        setCityInput(newCity);
+        onCityChange(newCity); // Notificar al componente padre
     };
 
     return (
@@ -24,14 +37,17 @@ export default function SelectorUI() {
                 <MenuItem disabled value="">
                     <em>Seleccione una ciudad</em>
                 </MenuItem>
-                <MenuItem value={"guayaquil"}>Guayaquil</MenuItem>
-                <MenuItem value={"quito"}>Quito</MenuItem>
-                <MenuItem value={"manta"}>Manta</MenuItem>
-                <MenuItem value={"cuenca"}>Cuenca</MenuItem>
+                {Object.entries(CITIES).map(([key, city]) => (
+                    <MenuItem key={key} value={key}>
+                        {city.displayName}
+                    </MenuItem>
+                ))}
             </Select>
-            {cityInput && (
+            {cityInput && CITIES[cityInput] && (
                 <p>
-                    Información del clima en <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>{cityInput}</span>
+                    Información del clima en <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>
+                        {CITIES[cityInput].displayName}
+                    </span>
                 </p>
             )}
         </FormControl>
