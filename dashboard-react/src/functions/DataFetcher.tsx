@@ -25,7 +25,7 @@ export default function DataFetcher({ latitude, longitude, cityName }: DataFetch
         setError(null);
 
         // URL de la API de Open-Meteo con coordenadas dinámicas
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=auto`
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,wind_speed_10m&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=auto`
 
         const fetchData = async () => {
 

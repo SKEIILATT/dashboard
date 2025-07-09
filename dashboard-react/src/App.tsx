@@ -119,10 +119,11 @@ function App() {
       </Grid>
 
       {/* Información adicional */}
-      <Grid>Elemento: Información adicional</Grid>
+      <Grid></Grid>
 
     </Grid>
   )
 }
 
 export default App
+

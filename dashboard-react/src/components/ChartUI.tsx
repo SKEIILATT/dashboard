@@ -13,8 +13,8 @@ interface ChartUIProps {
 }
 
 function prepareChartData(data: OpenMeteoResponse) {
-    if (!data.hourly?.time || !data.hourly?.temperature_2m) {
-        return { labels: [], temperatures: [] };
+    if (!data.hourly?.time || !data.hourly?.temperature_2m || !data.hourly?.wind_speed_10m) {
+        return { labels: [], temperatures: [], windSpeeds: [] };
     }
 
     // Tomar solo las primeras 24 horas para una mejor visualización
@@ -28,8 +28,9 @@ function prepareChartData(data: OpenMeteoResponse) {
     );
     
     const temperatures = data.hourly.temperature_2m.slice(0, maxPoints);
+    const windSpeeds = data.hourly.wind_speed_10m.slice(0, maxPoints);
     
-    return { labels, temperatures };
+    return { labels, temperatures, windSpeeds };
 }
 
 export default function ChartUI({ data, loading, error, cityName }: ChartUIProps) {
@@ -70,9 +71,9 @@ export default function ChartUI({ data, loading, error, cityName }: ChartUIProps
         );
     }
 
-    const { labels, temperatures } = prepareChartData(data);
+    const { labels, temperatures, windSpeeds } = prepareChartData(data);
 
-    if (labels.length === 0 || temperatures.length === 0) {
+    if (labels.length === 0 || temperatures.length === 0 || windSpeeds.length === 0) {
         return (
             <Box sx={{ height: 350, width: '100%' }}>
                 <Alert severity="info">
@@ -85,10 +86,13 @@ export default function ChartUI({ data, loading, error, cityName }: ChartUIProps
     return (
         <Box sx={{ width: '100%' }}>
             <Typography variant="h6" component="div" sx={{ mb: 2 }}>
-                Temperatura por Horas - {cityName || 'Ubicación'}
+                Temperatura y Velocidad del Viento - {cityName || 'Ubicación'}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 Ubicación: {data.latitude}°N, {data.longitude}°E | Elevación: {data.elevation}m
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+                Nota: Temperatura en {data.hourly_units?.temperature_2m ?? '°C'} (azul) y Velocidad del Viento en {data.hourly_units?.wind_speed_10m ?? 'km/h'} (naranja)
             </Typography>
             <LineChart
                 height={350}
@@ -97,6 +101,11 @@ export default function ChartUI({ data, loading, error, cityName }: ChartUIProps
                         data: temperatures, 
                         label: `Temperatura (${data.hourly_units?.temperature_2m ?? '°C'})`,
                         color: '#1976d2'
+                    },
+                    { 
+                        data: windSpeeds, 
+                        label: `Velocidad del Viento (${data.hourly_units?.wind_speed_10m ?? 'km/h'})`,
+                        color: '#ff6b35'
                     }
                 ]}
                 xAxis={[{ 
@@ -105,7 +114,7 @@ export default function ChartUI({ data, loading, error, cityName }: ChartUIProps
                     label: 'Hora'
                 }]}
                 yAxis={[{
-                    label: `Temperatura (${data.hourly_units?.temperature_2m ?? '°C'})`
+                    label: 'Temperatura'
                 }]}
                 margin={{ left: 80, right: 50, top: 50, bottom: 80 }}
             />
